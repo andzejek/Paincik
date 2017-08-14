@@ -13,7 +13,15 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
+				<Linker>
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libole32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdi32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdiplus.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libcomdlg32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libmsimg32.a" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/Paincik" prefix_auto="1" extension_auto="1" />
@@ -22,9 +30,15 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libole32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdi32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdiplus.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libcomdlg32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libmsimg32.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -37,7 +51,28 @@
 			<Add library="kernel32" />
 			<Add library="comctl32" />
 		</Linker>
+		<Unit filename="DIALOG_NEW.cpp" />
+		<Unit filename="DIALOG_NEW.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="include/CColorPalete.h" />
+		<Unit filename="include/CDrawAction.h" />
+		<Unit filename="include/CEditor.h" />
+		<Unit filename="include/CMenu.h" />
+		<Unit filename="include/CPaintBuffer.h" />
+		<Unit filename="include/CPaintTools.h" />
+		<Unit filename="include/CShapesTool.h" />
+		<Unit filename="include/CWindowEvents.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/CColorPalete.cpp" />
+		<Unit filename="src/CDrawAction.cpp" />
+		<Unit filename="src/CEditor.cpp" />
+		<Unit filename="src/CMenu.cpp" />
+		<Unit filename="src/CPaintBuffer.cpp" />
+		<Unit filename="src/CPaintTools.cpp" />
+		<Unit filename="src/CShapesTool.cpp" />
+		<Unit filename="src/CWindowEvents.cpp" />
+		<Unit filename="stdafx.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
