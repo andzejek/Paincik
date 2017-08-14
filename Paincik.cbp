@@ -16,11 +16,11 @@
 					<Add directory="include" />
 				</Compiler>
 				<Linker>
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libole32.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdi32.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdiplus.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libcomdlg32.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libmsimg32.a" />
+					<Add library="libole32.a" />
+					<Add library="libgdi32.a" />
+					<Add library="libgdiplus.a" />
+					<Add library="libcomdlg32.a" />
+					<Add library="libmsimg32.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -34,11 +34,11 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libole32.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdi32.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdiplus.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libcomdlg32.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libmsimg32.a" />
+					<Add library="libole32.a" />
+					<Add library="libgdi32.a" />
+					<Add library="libgdiplus.a" />
+					<Add library="libcomdlg32.a" />
+					<Add library="libmsimg32.a" />
 				</Linker>
 			</Target>
 		</Build>
