@@ -259,8 +259,11 @@ int CEditor::onMouseMove(short x,short y,int keys){
                         points[1].x=prev.x+brush[0]; points[1].y=prev.y+brush[1];
                         points[2].x=curr.x+brush[0]; points[2].y=curr.y+brush[1];
                         points[3].x=curr.x-brush[0]; points[3].y=curr.y-brush[1];
+
+                        ///Polygon(paintBuff->memDC,points,4);
                         CPolygon polygon(points,4,penSize/5,color1,color2,transparent);
-                            paintBuff->drawFigure(&polygon);break;}
+                        paintBuff->drawFigure(&polygon);
+                        break;}
                     case MODE_UNDEFINED:break;
                     case MODE_FILL:break;
                     case MODE_LUPE:break;
@@ -585,17 +588,26 @@ int CEditor::onCommand(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
             }
             if(wParam==MENU_ENABLE_SKETCH) paintBuff->isSketch=true;
             if(wParam==MENU_DISABLE_SKETCH) paintBuff->isSketch=false;
+            if(wParam==MENU_BRUSH_CLIPBOARD){
+
+                /**OpenClipboard(hWindow);
+                HBITMAP bmp=(HBITMAP)GetClipboardData(CF_BITMAP);
+                DeleteObject(SelectObject(paintBuff->memDC,CreatePatternBrush(bmp)));
+                DeleteObject(SelectObject(paintBuff->memDC,CreatePen(PS_NULL,0,0)));
+                DeleteObject(bmp);
+                CloseClipboard();*/
+            }
             if(wParam==MENU_PALETE) ShowWindow(colorPaletteWnd,SW_SHOW);
             if(wParam==MENU_PALETE_FILE){
                 wchar_t fileNameBuff[256];
                 if(OpenSaveImageDialog(hwnd, fileNameBuff, 256, false))
                 {
-                HWND temp=CreateWindowEx(WS_EX_TOOLWINDOW,ColorPaletteClassName,L"Paleta",WS_OVERLAPPEDWINDOW|WS_VISIBLE ,400,400,300,300,hWindow,0,0,fileNameBuff);
+                HWND temp=CreateWindowEx(WS_EX_TOOLWINDOW,ColorPaletteClassName,L"Paleta from file",WS_OVERLAPPEDWINDOW|WS_VISIBLE ,400,400,300,300,hWindow,0,0,fileNameBuff);
                 SetWindowText(temp,fileNameBuff);
                 }
             }
             if(wParam==MENU_PALETE_CLIPBOARD){
-                    HWND temp=CreateWindowEx(WS_EX_TOOLWINDOW,ColorPaletteClassName,L"Paleta",WS_OVERLAPPEDWINDOW|WS_VISIBLE ,400,400,300,300,hWindow,0,0,(LPVOID*)1);
+                    HWND temp=CreateWindowEx(WS_EX_TOOLWINDOW,ColorPaletteClassName,L"Paleta from clipboard",WS_OVERLAPPEDWINDOW|WS_VISIBLE ,400,400,300,300,hWindow,0,0,(LPVOID*)1);
                     SetWindowText(temp,L"Color Palette from clipboard");
             }
             if(wParam==MENU_EXIT) PostMessage(hwnd,WM_CLOSE,0,0);

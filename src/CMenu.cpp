@@ -38,6 +38,7 @@ CMenu::CMenu(){
 
      AppendMenu(sub, MF_STRING, MENU_ENABLE_SKETCH, L"Enable Sketch");
      AppendMenu(sub, MF_STRING, MENU_DISABLE_SKETCH, L"Disable Sketch");
+     AppendMenu(sub, MF_STRING, MENU_BRUSH_CLIPBOARD, L"Brush from clipboard");
     //AppendMenu( sub, MF_STRING, MENU_REDO, L"Redo \tCtrl+Shift+Z" );
     //AppendMenu( sub, MF_STRING, MENUC, L"pozycja c\tCtrl+c" );
     AppendMenu( bar, MF_POPUP, (unsigned int) sub, L"View" );

@@ -41,7 +41,7 @@ CPaintBuffer::CPaintBuffer(HWND _hwnd,int _width,int _height){
     scaled=true;
 }
 CPaintBuffer::~CPaintBuffer(){
-    list<CFigure*>::iterator it;
+    list<CDrawAction*>::iterator it;
     it = figures.begin();
     while(it != figures.end())
     {
@@ -126,7 +126,7 @@ void CPaintBuffer::drawFullScreen(){
     SetStretchBltMode(hdc,COLORONCOLOR);
     StretchBlt(hdc, x, y, drawRect.right/scaleX, drawRect.bottom/scaleY, renderDC, drawRect.left, drawRect.top, drawRect.right, drawRect.bottom, SRCCOPY);
 }
-void CPaintBuffer::drawFigure(CFigure *figure){
+void CPaintBuffer::drawFigure(CDrawAction *figure){
     if(figures.size()>5000)
     {
         for(int i=0;i<100;i++)
@@ -145,7 +145,7 @@ void CPaintBuffer::restore(){
 
     clean();
     BitBlt(memDC, 0, 0, width,height, restoreDC, 0, 0, SRCCOPY );
-    list<CFigure*>::iterator it;
+    list<CDrawAction*>::iterator it;
     it = figures.begin();
     while(it != figures.end())
     {

@@ -3,7 +3,7 @@
 #include "../stdafx.h"
 
 using namespace std;
-#include "CFigure.h"
+#include "CDrawAction.h"
 class CEditor;
 
 //#include "CEditor.h"
@@ -13,7 +13,7 @@ class CPaintBuffer{
     //friend void CEditor::drawPaintBuffer(CPaintBuffer*);
 public:
     CPaintBuffer(HWND,int,int);
-    void drawFigure(CFigure *figure);///
+    void drawFigure(CDrawAction *figure);///
     void resize(int,int);///
     void clean();///
     void scaleUp(){
@@ -137,7 +137,7 @@ private:
     int width,height;
     double scaleX,scaleY;///do wyrzucenia
     bool scaled;///do wyrzucenia
-    list<CFigure*> figures;
+    list<CDrawAction*> figures;
 
     HBITMAP oldMemBmp;
     HBITMAP oldRestoreBmp;

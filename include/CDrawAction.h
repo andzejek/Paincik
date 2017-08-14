@@ -1,23 +1,23 @@
-#ifndef CFIGURE_H
-#define CFIGURE_H
+#ifndef CDrawAction_H
+#define CDrawAction_H
 
 #include "../stdafx.h"
 
 
 
 
-class CFigure{
+class CDrawAction{
     public:
-        virtual CFigure* clone();
+        virtual CDrawAction* clone();
         virtual void drawToDC(HDC hdc,BYTE *bytes);
-        //virtual CFigure(CFigure *_figure);
-        virtual ~CFigure(){};
+        //virtual CDrawAction(CDrawAction *_figure);
+        virtual ~CDrawAction(){};
 
     protected:
     private:
 
 };
-class CFill:public CFigure{
+class CFill:public CDrawAction{
     POINT start;
     COLORREF color;
 public:
@@ -30,14 +30,14 @@ public:
         DeleteObject(SelectObject(hdc,CreateSolidBrush(color)));
         ExtFloodFill(hdc,start.x,start.y,GetPixel(hdc,start.x,start.y),FLOODFILLSURFACE);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CFill(start,color);
+        CDrawAction *temp=new CFill(start,color);
         return temp;
     }
     ~CFill(){};
 };
-class CLine:public CFigure{
+class CLine:public CDrawAction{
     POINT start,end;
     COLORREF color;
     int size;
@@ -61,14 +61,14 @@ class CLine:public CFigure{
         MoveToEx(hdc,start.x,start.y,0);
         LineTo(hdc,end.x,end.y);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CLine(start,end,size,color);
+        CDrawAction *temp=new CLine(start,end,size,color);
         return temp;
     }
     ~CLine(){}
 };
-class CEllipse : public CFigure{
+class CEllipse : public CDrawAction{
     POINT start,end;
     bool transparent;
     int size;
@@ -96,14 +96,14 @@ class CEllipse : public CFigure{
         //
         Ellipse(hdc,start.x,start.y,end.x,end.y);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CEllipse(start,end,size,color,fillColor,transparent);
+        CDrawAction *temp=new CEllipse(start,end,size,color,fillColor,transparent);
         return temp;
     }
     ~CEllipse(){}
 };
-class CRectangle : public CFigure{
+class CRectangle : public CDrawAction{
     POINT start,end;
     bool transparent;
     int size;
@@ -132,14 +132,14 @@ class CRectangle : public CFigure{
         //
         Rectangle(hdc,start.x,start.y,end.x,end.y);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CRectangle(start,end,size,color,fillColor,transparent);
+        CDrawAction *temp=new CRectangle(start,end,size,color,fillColor,transparent);
         return temp;
     }
     ~CRectangle(){}
 };
-class CPixel : public CFigure{
+class CPixel : public CDrawAction{
     POINT start;
     COLORREF color;
 public:
@@ -152,13 +152,13 @@ public:
     {
         SetPixel(hdc,start.x,start.y,color);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
         return new CPixel(start,color);
     }
     ~CPixel(){}
 };
-class CClean:public CFigure{
+class CClean:public CDrawAction{
     CClean(){};
     void drawToDC(HDC hdc,int width,int height)
     {
@@ -167,14 +167,14 @@ class CClean:public CFigure{
         FillRect(hdc,&rect,brush);
         DeleteObject(brush);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CClean;
+        CDrawAction *temp=new CClean;
         return temp;
     }
     ~CClean(){};
 };
-class CRubber: public CFigure{
+class CRubber: public CDrawAction{
 private:
     POINT start;
     int size;
@@ -193,14 +193,14 @@ public:
         FillRect(hdc,&rect,brush);
         DeleteObject(brush);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CRubber(start,size,color);
+        CDrawAction *temp=new CRubber(start,size,color);
         return temp;
     }
     ~CRubber(){};
 };
-class CSpray:public CFigure{
+class CSpray:public CDrawAction{
     COLORREF color;
     POINT start;
     int size;
@@ -226,13 +226,13 @@ public:
             SetPixel(hdc,x,y,colorF);
         }
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CSpray(start,size,color,seed);
+        CDrawAction *temp=new CSpray(start,size,color,seed);
         return temp;
     }
 };
-class CSprayFast:public CFigure{///unusable not draw to restoreDC???
+class CSprayFast:public CDrawAction{///unusable not draw to restoreDC???
     COLORREF color;
     POINT start;
     int size;
@@ -290,13 +290,13 @@ public:
         //SetPixel(hdc,start.x-size/2+rand()%size,start.y-size/2+rand()%size,color);
         }
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CSprayFast(start,size,cover,color,seed,width,height);
+        CDrawAction *temp=new CSprayFast(start,size,cover,color,seed,width,height);
         return temp;
     }
 };
-class CText:public CFigure{
+class CText:public CDrawAction{
     POINT start;
     wchar_t text[256];
 public:
@@ -310,13 +310,13 @@ public:
     {
         TextOutW(hdc,start.x,start.y,text,wcslen(text));
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CText(start,text);
+        CDrawAction *temp=new CText(start,text);
         return temp;
     }
 };
-class CText2:public CFigure{
+class CText2:public CDrawAction{
     RECT rect;
     wchar_t text[1024];
     LOGFONT logfont;
@@ -345,13 +345,13 @@ public:
         DrawTextW(hdc,text,wcslen(text),&rect,DT_EDITCONTROL|DT_WORDBREAK);
         DeleteObject(SelectObject(hdc,oldFont));
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CText2(rect,text,&logfont,color,color2,transparent);
+        CDrawAction *temp=new CText2(rect,text,&logfont,color,color2,transparent);
         return temp;
     }
 };
-class CNegColor:public CFigure{
+class CNegColor:public CDrawAction{
     POINT start,end;
 public:
     CNegColor(POINT _start,POINT _end)
@@ -369,13 +369,13 @@ public:
                SetPixel(hdc,i,j,RGB( 255-GetRValue(color), 255-GetGValue(color), 255-GetBValue(color) ));
            }
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CNegColor(start,end);
+        CDrawAction *temp=new CNegColor(start,end);
         return temp;
     }
 };
-class CPasteBMP : public CFigure{
+class CPasteBMP : public CDrawAction{
     POINT start,end;
     BYTE *data;
     int width,height;
@@ -444,13 +444,13 @@ private:
         delete[]data;
 
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CPasteBMP(start,end,data,width,height);
+        CDrawAction *temp=new CPasteBMP(start,end,data,width,height);
         return temp;
     }
 };
-class CPolygon :public CFigure{
+class CPolygon :public CDrawAction{
     bool transparent;
     int size;
     COLORREF color,fillColor;
@@ -481,14 +481,14 @@ class CPolygon :public CFigure{
         //
         Polygon(hdc,points,pCount);
     }
-    CFigure* clone()
+    CDrawAction* clone()
     {
-        CFigure *temp=new CPolygon(points,pCount,size,color,fillColor,transparent);
+        CDrawAction *temp=new CPolygon(points,pCount,size,color,fillColor,transparent);
         return temp;
     }
     ~CPolygon(){
     delete []points;
     }
 };
-#endif // CFIGURE_H
+#endif // CDrawAction_H
 
