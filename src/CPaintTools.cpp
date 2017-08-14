@@ -246,7 +246,7 @@ int CPaintTools::onCommand(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam){
                 case BUTTON_BRUSH:      paintMode=MODE_BRUSH;           paintAtt=ATT_BRUSHES;                        break;
                 case BUTTON_SPRAY:      paintMode=MODE_SPRAY;           paintAtt=ATT_NULL;                           break;
                 case BUTTON_TEXT:       paintMode=MODE_TEXT;            paintAtt=ATT_TRANSPARENT;                    break;
-                case BUTTON_FIGURES:    paintMode=MODE_GEOMETRY;        paintAtt=ATT_FIGURE;                         break;
+                case BUTTON_FIGURES:    paintMode=paintMode;            paintAtt=ATT_FIGURE;                         break;
 
                 case BUTTON_TRANSPARENT:    transparent=true;       break;
                 case BUTTON_NOTRANSPARENT:  transparent=false;      break;

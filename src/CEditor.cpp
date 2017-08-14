@@ -366,7 +366,7 @@ int CEditor::onDestroy(){
     return 0;
 }
 int CEditor::onClose(){
-    paintBuff->saveToFile((wchar_t*)L"autozapis.png");
+    ///paintBuff->saveToFile((wchar_t*)L"autozapis.png");
     SendMessage(hWindow,WM_DESTROY,0,0);
     return 0;
 }
