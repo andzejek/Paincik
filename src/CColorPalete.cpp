@@ -5,7 +5,32 @@ int CColorPalette::onCreate(CREATESTRUCT *cs){
     hdc=GetDC(hWindow);
     SetScrollPos(hWindow,SB_HORZ,100,true);
     memdc=CreateCompatibleDC(hdc);
-    if(cs->lpCreateParams!=0)
+    if(cs->lpCreateParams==(LPVOID)1)
+    {
+        OpenClipboard(hWindow);
+        HBITMAP bmp=(HBITMAP)GetClipboardData(CF_BITMAP);
+        if(bmp)
+        {
+            HDC memdc2=CreateCompatibleDC(hdc);
+            HBITMAP hbmOld2=(HBITMAP)SelectObject(memdc2,bmp);
+
+            BITMAP iBmp;
+            GetObject(bmp,sizeof(BITMAP),&iBmp);
+            hbmColorPalette=CreateCompatibleBitmap(hdc,iBmp.bmWidth,iBmp.bmHeight);
+            hbmOld=(HBITMAP)SelectObject(memdc,hbmColorPalette);
+            GetObject(hbmColorPalette,sizeof(BITMAP),&iBmp);
+            MoveWindow(hWindow,0,0,iBmp.bmWidth,iBmp.bmHeight,0);
+            StretchBlt(memdc,0,0,iBmp.bmWidth,iBmp.bmHeight,memdc2,0,0,iBmp.bmWidth,iBmp.bmHeight,SRCCOPY);
+            isFromFile=true;
+            SelectObject(memdc2,hbmOld2);
+            DeleteDC(memdc2);
+            DeleteObject(bmp);
+        }
+        else DestroyWindow(hWindow);
+
+        CloseClipboard();
+    }
+    else if(cs->lpCreateParams!=0)
     {
         hbmColorPalette=(HBITMAP) loadImage((wchar_t*)cs->lpCreateParams);
         if(hbmColorPalette)

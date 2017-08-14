@@ -594,6 +594,10 @@ int CEditor::onCommand(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
                 SetWindowText(temp,fileNameBuff);
                 }
             }
+            if(wParam==MENU_PALETE_CLIPBOARD){
+                    HWND temp=CreateWindowEx(WS_EX_TOOLWINDOW,ColorPaletteClassName,L"Paleta",WS_OVERLAPPEDWINDOW|WS_VISIBLE ,400,400,300,300,hWindow,0,0,(LPVOID*)1);
+                    SetWindowText(temp,L"Color Palette from clipboard");
+            }
             if(wParam==MENU_EXIT) PostMessage(hwnd,WM_CLOSE,0,0);
             if(wParam==MENU_UNDO) paintBuff->undo();
             if(wParam==MENU_NEW) {

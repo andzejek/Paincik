@@ -30,7 +30,8 @@ CMenu::CMenu(){
 
     AppendMenuW(subb, MF_STRING, MENU_TOOLS, L"Tools");
     AppendMenuW(subb, MF_STRING, MENU_PALETE, L"Color palette");
-    AppendMenuW(subb, MF_STRING, MENU_PALETE_FILE, L"Palette from file");
+    AppendMenuW(subb, MF_STRING, MENU_PALETE_FILE, L"└>from file");
+    AppendMenuW(subb, MF_STRING, MENU_PALETE_CLIPBOARD, L"└>from clipboard");
 
     AppendMenu(sub, MF_STRING, MENU_FULLSCREEN, L"FullScreen \tF11");
      AppendMenu(sub, MF_STRING, MENU_ADD_SKETCH, L"Add Sketch");
