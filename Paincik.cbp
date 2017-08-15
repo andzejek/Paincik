@@ -52,6 +52,7 @@
 			<Add library="comctl32" />
 		</Linker>
 		<Unit filename="DIALOG_NEW.cpp" />
+		<Unit filename="DIALOG_NEW.h" />
 		<Unit filename="DIALOG_NEW.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
@@ -73,6 +74,7 @@
 		<Unit filename="src/CShapesTool.cpp" />
 		<Unit filename="src/CWindowEvents.cpp" />
 		<Unit filename="stdafx.cpp" />
+		<Unit filename="stdafx.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

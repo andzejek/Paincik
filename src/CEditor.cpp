@@ -4,8 +4,8 @@ int CEditor::onCreate(CREATESTRUCT *cs){
             SendMessage(hWindow,WM_SYSCOLORCHANGE,0,0);
 
             paintToolsWnd=CreateWindowEx(WS_EX_TOOLWINDOW,PaintToolsClassName,L"Paint Tools",WS_OVERLAPPEDWINDOW^(WS_THICKFRAME|WS_MAXIMIZEBOX) ,0,0,80,454,hWindow,0,0,0);
-            ShowWindow(paintToolsWnd,SW_SHOW);
             colorPaletteWnd=CreateWindowEx(WS_EX_TOOLWINDOW,ColorPaletteClassName,L"Color Palette",WS_OVERLAPPEDWINDOW|WS_HSCROLL ,400,400,300,300,hWindow,0,0,0);
+            ShowWindow(paintToolsWnd,SW_SHOW);
             ShowWindow(colorPaletteWnd,SW_SHOW);
             edit = CreateWindowEx( 0, L"EDIT", L"", WS_CHILD|ES_AUTOHSCROLL|ES_AUTOVSCROLL|ES_MULTILINE, 0,0, 100,100, hWindow, 0,0, NULL );
             //shapesToolWnd=CreateWindowEx(WS_EX_TOOLWINDOW,ShapesToolClassName,L"Shapes<-TEST",WS_OVERLAPPEDWINDOW ,700,400,300,200,hWindow,0,0,0);
