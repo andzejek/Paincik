@@ -57,4 +57,3 @@ HBITMAP create32DIB(HDC _hdc,int _width,int _height,BYTE **data){
     BitmapInfo.bmiHeader.biCompression = BI_RGB;
     return CreateDIBSection(_hdc, &BitmapInfo, DIB_RGB_COLORS, (VOID**)data, NULL, 0);
 }
-

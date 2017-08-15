@@ -41,7 +41,7 @@ CPaintBuffer::CPaintBuffer(HWND _hwnd,int _width,int _height){
     drawRect.right=width;
     drawRect.top=0;
     drawRect.bottom=height;
-    printf("width=%d",width);
+    //printf("width=%d",width);
     clean();
     BitBlt(restoreDC, 0, 0, width,height, memDC, 0, 0, SRCCOPY );
     scaled=true;
@@ -58,7 +58,7 @@ CPaintBuffer::~CPaintBuffer(){
     it=drawActions.begin();
     while(it!=drawActions.end())
     {
-                for(int i=0;i<(*it).size();i++)
+                for(unsigned int i=0;i<(*it).size();i++)
                 {
                     delete (*it)[i];
 
@@ -145,8 +145,8 @@ void CPaintBuffer::drawFullScreen(){
     StretchBlt(hdc, x, y, drawRect.right/scaleX, drawRect.bottom/scaleY, renderDC, drawRect.left, drawRect.top, drawRect.right, drawRect.bottom, SRCCOPY);
 }
 void CPaintBuffer::drawFigure(CDrawAction *figure){
-    printf("tu1\n");
-    figure->show();
+    //printf("tu1\n");
+    ///figure->show();
     /**if(figures.size()>5000)
     {
         for(int i=0;i<100;i++)
@@ -160,19 +160,30 @@ void CPaintBuffer::drawFigure(CDrawAction *figure){
     if(figures.size()%1000==0)printf("figures.size()=%d\n",figures.size());
     figure->drawToDC(memDC,memBytes);
     figures.push_back(figure->clone());*/
+    if(drawActions.size()>100)
+    {
+        for(unsigned int i=0;i<(drawActions.front()).size();i++)
+                {
+                    (drawActions.front())[i]->drawToDC(restoreDC,restoreBytes);
+                    delete (drawActions.front())[i];
+
+                }
+                drawActions.pop_front();
+    }
     figure->drawToDC(memDC,memBytes);
     (drawActions.back()).push_back(figure->clone());
-    printf("tu2\n");
+    itredo=drawActions.end();
+    //printf("tu2\n");
 }
 void CPaintBuffer::restore(){
-    printf("tu3\n");
+    //printf("tu3\n");
     clean();
     BitBlt(memDC, 0, 0, width,height, restoreDC, 0, 0, SRCCOPY );
     list<vector<CDrawAction*>>::iterator it;
     it = drawActions.begin();
     while(it != drawActions.end())
     {
-        for(int i=0;i<(*it).size();i++)
+        for(unsigned int i=0;i<(*it).size();i++)
         {
         (*it)[i]->drawToDC(memDC,memBytes);
         }
@@ -188,13 +199,15 @@ void CPaintBuffer::restore(){
         (*it)->drawToDC(memDC,memBytes);
         ++it;
     }*/
-    printf("tu4\n");
+    //printf("tu4\n");
 }
 void CPaintBuffer::undo(){
-    printf("tu5\n");
+    //printf("tu5\n");
         if(recording) return;
-        for(int i=0;i<1&&drawActions.size();i++){
-                for(int i=0;i<(drawActions.back()).size();i++)
+        list<vector<CDrawAction*>>::iterator it;
+        it=drawActions.begin();
+        if(drawActions.size()){
+                for(unsigned int i=0;i<drawActions.back().size();i++)
                 {
                     delete (drawActions.back())[i];
 
@@ -205,9 +218,16 @@ void CPaintBuffer::undo(){
                 figures.pop_back();}
         ///printf("figures.size()=%d\n",figures.size());
         restore();*/
+        itredo--;
         restore();
-        printf("tu6\n");
+        //printf("tu6\n");
     }
+void CPaintBuffer::redo(){
+    if(itredo!=drawActions.end())
+    {
+        itredo++;
+    }
+}
 #define errhandler(A,B) printf(A)
 void CPaintBuffer::saveToFile(wchar_t *_fileName){
         BYTE *bytes;

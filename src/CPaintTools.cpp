@@ -1,5 +1,6 @@
 #include "CPaintTools.h"
 #include "../DIALOG_NEW.h"
+
 int CPaintTools::onCreate(CREATESTRUCT *cs){
 
             GetClientRect(hWindow,&clientRect);
@@ -85,6 +86,25 @@ int CPaintTools::onCreate(CREATESTRUCT *cs){
             SendMessage(buttonFigureLine, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hbmIconFigureLine);
             buttonFigurePolygon=CreateWindowEx( 0, L"BUTTON", L"figure polygon", WS_CHILD | WS_VISIBLE|BS_BITMAP,clientRect.right/2,192, clientRect.right/2, 32, hWindow, (HMENU)BUTTON_FIGURE_POLYGON, 0, NULL );
             SendMessage(buttonFigurePolygon, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hbmIconFigurePolygon);
+            #define ID_TRACKBAR 43318
+            InitCommonControls();
+            trackbar = CreateWindowEx(0,TRACKBAR_CLASS,L"Trackbar Control",WS_CHILD |WS_VISIBLE,0,370,clientRect.right,30,hWindow,(HMENU)ID_TRACKBAR,0,NULL);
+int iMin=0,iMax=100,iSelMin=0,iSelMax=50;
+    SendMessage(trackbar, TBM_SETRANGE,
+        (WPARAM) TRUE,                   // redraw flag
+        (LPARAM) MAKELONG(iMin, iMax));  // min. & max. positions
+
+    SendMessage(trackbar, TBM_SETPAGESIZE,
+        0, (LPARAM) 4);                  // new page size
+
+    SendMessage(trackbar, TBM_SETSEL,
+        (WPARAM) FALSE,                  // redraw flag
+        (LPARAM) MAKELONG(iSelMin, iSelMax));
+
+    SendMessage(trackbar, TBM_SETPOS,
+        (WPARAM) TRUE,                   // redraw flag
+        (LPARAM) iSelMin);
+
 
             //HWND buttonFigureEllipse=
             color1=0;
@@ -151,40 +171,50 @@ int CPaintTools::onPaint(){
     return 0;
 }
 int CPaintTools::onCommand(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam){
-            if(paintAtt==ATT_BRUSHES)
-            {
-                ShowWindow(buttonFigureModeFill,SW_HIDE);
-                ShowWindow(buttonFigureModeFrame,SW_HIDE);
-                ShowWindow(buttonFigureModeFillFrame,SW_HIDE);
-                ShowWindow(buttonTransparent,SW_HIDE);
-                ShowWindow(buttonNoTransparent,SW_HIDE);
-                ShowWindow(frame,SW_SHOW);
-            }
-            if(paintAtt==ATT_NULL)
-            {
+            if(paintAtt==ATT_SPRAY){
                 ShowWindow(buttonFigureModeFill,SW_HIDE);
                 ShowWindow(buttonFigureModeFrame,SW_HIDE);
                 ShowWindow(buttonFigureModeFillFrame,SW_HIDE);
                 ShowWindow(buttonTransparent,SW_HIDE);
                 ShowWindow(buttonNoTransparent,SW_HIDE);
                 ShowWindow(frame,SW_HIDE);
+                ShowWindow(trackbar,SW_SHOW);
             }
-            if(paintAtt==ATT_TRANSPARENT){
+            else if(paintAtt==ATT_BRUSHES){
+                ShowWindow(buttonFigureModeFill,SW_HIDE);
+                ShowWindow(buttonFigureModeFrame,SW_HIDE);
+                ShowWindow(buttonFigureModeFillFrame,SW_HIDE);
+                ShowWindow(buttonTransparent,SW_HIDE);
+                ShowWindow(buttonNoTransparent,SW_HIDE);
+                ShowWindow(frame,SW_SHOW);
+                ShowWindow(trackbar,SW_HIDE);
+            }
+            else if(paintAtt==ATT_NULL){
+                ShowWindow(buttonFigureModeFill,SW_HIDE);
+                ShowWindow(buttonFigureModeFrame,SW_HIDE);
+                ShowWindow(buttonFigureModeFillFrame,SW_HIDE);
+                ShowWindow(buttonTransparent,SW_HIDE);
+                ShowWindow(buttonNoTransparent,SW_HIDE);
+                ShowWindow(frame,SW_HIDE);
+                ShowWindow(trackbar,SW_HIDE);
+            }
+            else if(paintAtt==ATT_TRANSPARENT){
                 ShowWindow(buttonFigureModeFill,SW_HIDE);
                 ShowWindow(buttonFigureModeFrame,SW_HIDE);
                 ShowWindow(buttonFigureModeFillFrame,SW_HIDE);
                 ShowWindow(buttonTransparent,SW_SHOW);
                 ShowWindow(buttonNoTransparent,SW_SHOW);
                 ShowWindow(frame,SW_SHOW);
+                ShowWindow(trackbar,SW_HIDE);
             }
-            if(paintAtt==ATT_FIGURE)
-            {
+            else if(paintAtt==ATT_FIGURE){
                 ShowWindow(buttonTransparent,SW_HIDE);
                 ShowWindow(buttonNoTransparent,SW_HIDE);
                 ShowWindow(buttonFigureModeFill,SW_SHOW);
                 ShowWindow(buttonFigureModeFrame,SW_SHOW);
                 ShowWindow(buttonFigureModeFillFrame,SW_SHOW);
                 ShowWindow(frame,SW_SHOW);
+                ShowWindow(trackbar,SW_HIDE);
             }
             if((HIWORD(wParam) == EN_CHANGE) &&
             (LOWORD(wParam) == EDIT_PENSIZE))
@@ -244,7 +274,7 @@ int CPaintTools::onCommand(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam){
                 case BUTTON_LUPE:       paintMode=MODE_LUPE;            paintAtt=ATT_NULL;                           break;
                 case BUTTON_PENCIL:     paintMode=MODE_PENCIL;          paintAtt=ATT_NULL;                           break;
                 case BUTTON_BRUSH:      paintMode=MODE_BRUSH;           paintAtt=ATT_BRUSHES;                        break;
-                case BUTTON_SPRAY:      paintMode=MODE_SPRAY;           paintAtt=ATT_NULL;                           break;
+                case BUTTON_SPRAY:      paintMode=MODE_SPRAY;           paintAtt=ATT_SPRAY;                          break;
                 case BUTTON_TEXT:       paintMode=MODE_TEXT;            paintAtt=ATT_TRANSPARENT;                    break;
                 case BUTTON_FIGURES:    paintMode=paintMode;            paintAtt=ATT_FIGURE;                         break;
 
@@ -270,6 +300,7 @@ int CPaintTools::onCommand(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam){
             SendMessage(hParentWindow,WM_COMMAND,CMD_SET_TRANSPARENT,transparent);
             SendMessage(hParentWindow,WM_COMMAND,CMD_SELECT_PAINT_TOOL,paintMode);
             SendMessage(hParentWindow,WM_COMMAND,CMD_SET_FIGURE_MODE,figureMode);
+
             SetActiveWindow(hParentWindow);
 
             }
@@ -331,5 +362,12 @@ int CPaintTools::onLeftButtonDown(short x,short y,int keys){
     }
     InvalidateRect(hWindow,0,1);
     SendMessage(hWindow,WM_PAINT,0,0);
+    return 0;
+}
+int CPaintTools::onHScroll(WPARAM wParam)
+{
+    cover=SendMessage(trackbar, TBM_GETPOS, 0, 0);
+    printf("cover=%d\n",cover);
+    SendMessage(hParentWindow,WM_COMMAND,CMD_SET_COVER,cover);
     return 0;
 }

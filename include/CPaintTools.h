@@ -14,6 +14,7 @@ enum PaintATT
     ATT_BRUSHES=1,
     ATT_FIGURE=2,
     ATT_TRANSPARENT=3,
+    ATT_SPRAY=4,
 };
 enum PaintMode
 {
@@ -98,6 +99,7 @@ class CPaintTools : public CWindowEvents{
         int onPaint()override;
         int onCommand(HWND hwnd,UINT message,WPARAM wparam,LPARAM lParam)override;
         int onLeftButtonDown(short x,short y,int k)override;
+        int onHScroll(WPARAM)override;
         virtual ~CPaintTools()
         {
             printf("CPaintTools: deconstructor!\n");
@@ -138,7 +140,7 @@ class CPaintTools : public CWindowEvents{
 
         HWND editPenSize;
         HWND editCover;//for flamaster and spray,brush ... from 1 to 100;
-
+        HWND trackbar;
 
 
         COLORREF color1,color2;

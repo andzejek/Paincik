@@ -17,6 +17,7 @@ struct Event{///still useless
 };
 class CWindowEvents{
 public:
+    virtual int onTimer(WPARAM wParam,LPARAM lParam)                            {return 0x5AEBE140;}
     virtual int onSysColorChange()                                              {return 0x5AEBE140;}
     virtual int onEraseBKGND()                                                  {return 0x5AEBE140;}
     virtual int onVScroll(WPARAM wParam)                                        {return 0x5AEBE140;}
@@ -37,10 +38,12 @@ public:
     virtual int onWindowPosChange()                                             {return 0x5AEBE140;}
     int event(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
-        //Event event(hwnd,message,wParam,lParam);
+        ///Event l_event(hwnd,message,wParam,lParam);
+        ///Event event(hwnd,message,wParam,lParam);
         int ret=0;
         switch (message)
-        {
+    {
+        case WM_TIMER:          ret=onTimer(wParam,lParam);                                     break;
         case WM_WINDOWPOSCHANGING:ret=onWindowPosChange();                                      break;
         case WM_SYSCOLORCHANGE: ret=onSysColorChange();                                         break;
         case WM_ERASEBKGND:     ret=onEraseBKGND();                                             break;

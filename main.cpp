@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <commctrl.h>
 #include "CEditor.h"
 wchar_t EditorClassName[ ] = L"EDITOR WINDOW CLASS";
 wchar_t PaintToolsClassName[ ] = L"EDITOR TOOLS CLASS";

@@ -18,6 +18,7 @@ extern wchar_t ShapesToolClassName[];
 BOOL OpenSaveImageDialog(HWND, LPWSTR, WORD, BOOL);
 class CEditor : public CWindowEvents{
 
+    int onTimer(WPARAM,LPARAM) override;
     int onSysColorChange() override;
     int onVScroll(WPARAM wParam) override;
     int onHScroll(WPARAM wParam) override;

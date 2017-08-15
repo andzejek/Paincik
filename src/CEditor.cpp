@@ -1,6 +1,8 @@
 #include "CEditor.h"
-
+#define ID_TIMER 231
 int CEditor::onCreate(CREATESTRUCT *cs){
+            if( SetTimer( hWindow, ID_TIMER, 32, NULL ) == 0 );///to-do?
+
             SendMessage(hWindow,WM_SYSCOLORCHANGE,0,0);
 
             paintToolsWnd=CreateWindowEx(WS_EX_TOOLWINDOW,PaintToolsClassName,L"Paint Tools",WS_OVERLAPPEDWINDOW^(WS_THICKFRAME|WS_MAXIMIZEBOX) ,0,0,80,454,hWindow,0,0,0);
@@ -34,6 +36,22 @@ int CEditor::onCreate(CREATESTRUCT *cs){
             lButtonHold=false;
             if(GetDeviceCaps(hdc,BITSPIXEL)!=32) onDestroy();///???
             return 0;
+}
+int CEditor::onTimer(WPARAM wParam,LPARAM lParam){
+    if(lButtonHold)
+    {
+        POINT pt;
+
+        GetCursorPos(&pt);
+        ScreenToClient(hWindow,&pt);
+        pt=paintBuff->resolveCoordToMe(pt);
+        unsigned int lo,hi;
+        __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+        CSprayFast fastSpray(pt,penSize,cover,color1,((uint64_t)hi << 32) | lo,paintBuff->width,paintBuff->height);
+        paintBuff->drawFigure(&fastSpray);
+        SendMessage(hWindow,WM_PAINT,0,0);
+    }
+    return 0;
 }
 int CEditor::onPaint(){
             PAINTSTRUCT PS;
@@ -453,7 +471,9 @@ int CEditor::onKeyDown(int key,int flags){
 }
 int CEditor::onCommand(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
             if(wParam==CMD_SET_PEN_SIZE) penSize=lParam;
-            if(wParam==CMD_SET_COVER) cover=lParam;
+            if(wParam==CMD_SET_COVER) {
+                    cover=lParam;
+            }
             if(wParam==CMD_SET_BRUSH_DIR) { brush[0]=LOWORD(lParam);brush[1]=HIWORD(lParam);}
             if(wParam==CMD_SELECT_PAINT_TOOL){
                 int prevMode=paintMode;
@@ -566,7 +586,7 @@ int CEditor::onCommand(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
                         HBITMAP temp=CreateCompatibleBitmap(hdc,selectEnd.x-selectStart.x, selectEnd.y-selectStart.y);
                         HBITMAP oldFromHdc3=(HBITMAP)SelectObject(hdc3,temp);
                         HBITMAP old=(HBITMAP)SelectObject(hdc2,bmp);
-                        printf("probuje wkleic %d %d!\n",(int)ibmp.bmWidth,(int)ibmp.bmHeight);
+                        //printf("probuje wkleic %d %d!\n",(int)ibmp.bmWidth,(int)ibmp.bmHeight);
                         SetStretchBltMode(hdc3,HALFTONE);
                         StretchBlt(hdc3, 0, 0, selectEnd.x-selectStart.x, selectEnd.y-selectStart.y, hdc2, 0, 0, ibmp.bmWidth, ibmp.bmHeight, SRCCOPY);
                         GetObject(temp,sizeof(ibmp),&ibmp);
@@ -692,36 +712,6 @@ int CEditor::onMouseWheel(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             SendMessage(paintToolsWnd,WM_COMMAND,CMD_SET_PEN_SIZE,penSize);
 
             return 0;
-}
-BOOL OpenSaveImageDialog(HWND hwnd, LPWSTR szFileNameBuff, WORD wBuffSize, BOOL bSave){
-    ZeroMemory(szFileNameBuff,wBuffSize);
-   OPENFILENAMEW ofn;
-
-   ZeroMemory(&ofn, sizeof(ofn));
-
-   ofn.lStructSize = sizeof(ofn);
-   ofn.hwndOwner = hwnd; //okno
-   ofn.lpstrFilter = L"Image Files\0*.bmp;*.jpg;*.png;*.jpeg;*.jpe\0All Files (*.*)\0*.*\0\0"; //lista wyboru maski w formacie
-// "nazwa\0rozszerzenie\0nazwa\0rozszerzenie...nazwa\0rozszerzenie\0\0"
-
-   ofn.lpstrFile = szFileNameBuff;
-   ofn.nMaxFile = wBuffSize; //rozmiar bufora szFileNameBuff, najlepiej MAX_PATH
-   ofn.lpstrDefExt = L"png"; //domyślne rozszerzenie
-
-   if(bSave) //zapis lub odczyt
-   {
-      ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY |
-         OFN_OVERWRITEPROMPT; //więcej o flagach w MSDN pod OPENFILENAME
-      if(!GetSaveFileNameW(&ofn))
-         return FALSE;
-   }
-   else
-   {
-      ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-      if(!GetOpenFileNameW(&ofn))
-         return FALSE;
-   }
-   return TRUE;
 }
 int CEditor::onVScroll(WPARAM wParam){
     SCROLLINFO si;
@@ -881,7 +871,7 @@ void CEditor::drawPaintBuffer(CPaintBuffer *paintBuffer){
     int t=rdtsc();
     paintBuff->drawPaintBuffToRenderBuff();
     int t2=rdtsc()-t;
-    //printf("1zajelo to=%d\n",t2);
+    ///printf("1zajelo to=%d\n",t2);
 
     if(paintMode==MODE_TEXT)paintBuff->drawTextToRenderBuff(rect,textBuffor,&lf,color1,color2,transparent);
                     bool transparent=false;
@@ -893,7 +883,7 @@ void CEditor::drawPaintBuffer(CPaintBuffer *paintBuffer){
     t=rdtsc();
     paintBuff->drawRenderBuffToDC(hdc);
     t2=rdtsc()-t;
-    //printf("2zajelo to=%d\n",t2);
+    ///printf("2zajelo to=%d\n",t2);
     rect=paintBuff->getDrawRect();
     HRGN hrgn=CreateRectRgn(rect.left,rect.top,rect.left+rect.right,rect.top+rect.bottom);
     SelectClipRgn(hdc,hrgn);///ten region po to zeby nie wychodzic z rysowaniem poza paintbuffer
@@ -924,3 +914,34 @@ void CEditor::switchFullScreen(){
                         SetWindowPos(hWindow,0,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),SWP_NOZORDER | SWP_SHOWWINDOW);
                     }
 }
+BOOL OpenSaveImageDialog(HWND hwnd, LPWSTR szFileNameBuff, WORD wBuffSize, BOOL bSave){
+    ZeroMemory(szFileNameBuff,wBuffSize);
+   OPENFILENAMEW ofn;
+
+   ZeroMemory(&ofn, sizeof(ofn));
+
+   ofn.lStructSize = sizeof(ofn);
+   ofn.hwndOwner = hwnd; //okno
+   ofn.lpstrFilter = L"Image Files\0*.bmp;*.jpg;*.png;*.jpeg;*.jpe\0All Files (*.*)\0*.*\0\0"; //lista wyboru maski w formacie
+// "nazwa\0rozszerzenie\0nazwa\0rozszerzenie...nazwa\0rozszerzenie\0\0"
+
+   ofn.lpstrFile = szFileNameBuff;
+   ofn.nMaxFile = wBuffSize; //rozmiar bufora szFileNameBuff, najlepiej MAX_PATH
+   ofn.lpstrDefExt = L"png"; //domyślne rozszerzenie
+
+   if(bSave) //zapis lub odczyt
+   {
+      ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY |
+         OFN_OVERWRITEPROMPT; //więcej o flagach w MSDN pod OPENFILENAME
+      if(!GetSaveFileNameW(&ofn))
+         return FALSE;
+   }
+   else
+   {
+      ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+      if(!GetOpenFileNameW(&ofn))
+         return FALSE;
+   }
+   return TRUE;
+}
+
