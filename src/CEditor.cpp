@@ -38,7 +38,7 @@ int CEditor::onCreate(CREATESTRUCT *cs){
             return 0;
 }
 int CEditor::onTimer(WPARAM wParam,LPARAM lParam){
-    if(lButtonHold)
+    if(lButtonHold&&paintMode==MODE_SPRAY)
     {
         POINT pt;
 

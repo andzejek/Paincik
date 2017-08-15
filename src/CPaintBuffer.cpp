@@ -172,7 +172,7 @@ void CPaintBuffer::drawFigure(CDrawAction *figure){
     }
     figure->drawToDC(memDC,memBytes);
     (drawActions.back()).push_back(figure->clone());
-    itredo=drawActions.end();
+    ///itredo=drawActions.end();
     //printf("tu2\n");
 }
 void CPaintBuffer::restore(){
@@ -218,16 +218,16 @@ void CPaintBuffer::undo(){
                 figures.pop_back();}
         ///printf("figures.size()=%d\n",figures.size());
         restore();*/
-        itredo--;
+        ///itredo--;
         restore();
         //printf("tu6\n");
     }
-void CPaintBuffer::redo(){
+/**void CPaintBuffer::redo(){
     if(itredo!=drawActions.end())
     {
         itredo++;
     }
-}
+}*/
 void CPaintBuffer::saveToFile(wchar_t *_fileName){
         BYTE *bytes;
         HBITMAP temp=create32DIB(memDC,width,height,&bytes);///temp-because gdi-plus cant save h-bitmap what is current selected to DC?

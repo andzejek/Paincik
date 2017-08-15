@@ -41,7 +41,7 @@ public:
     void saveToFile(wchar_t *_fileName);
     void loadFromFile(wchar_t *_fileName);
     void undo();
-    void redo();
+    ///void redo();
     int getWidth() {return width;}
     int getHeight() {return height;}
     void drawPaintBuffToRenderBuff()
@@ -139,7 +139,7 @@ private:
     bool scaled;///do wyrzucenia
     list<CDrawAction*> figures;
     list<vector<CDrawAction*>> drawActions;
-    list<vector<CDrawAction*>>::iterator itredo;
+    ///list<vector<CDrawAction*>>::iterator itredo;
     void startRecordActions(){
         drawActions.push_back(vector<CDrawAction*>());
         printf("zaczynam nagrywac!\n");
