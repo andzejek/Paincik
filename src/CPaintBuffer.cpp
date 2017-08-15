@@ -47,13 +47,25 @@ CPaintBuffer::CPaintBuffer(HWND _hwnd,int _width,int _height){
     scaled=true;
 }
 CPaintBuffer::~CPaintBuffer(){
-    list<CDrawAction*>::iterator it;
+    /*list<CDrawAction*>::iterator it;
     it = figures.begin();
     while(it != figures.end())
     {
         delete (*it);
         ++it;
+    }*/
+    list<vector<CDrawAction*>>::iterator it;
+    it=drawActions.begin();
+    while(it!=drawActions.end())
+    {
+                for(int i=0;i<(*it).size();i++)
+                {
+                    delete (*it)[i];
+
+                }
+                it++;
     }
+    drawActions.erase(drawActions.begin(),drawActions.end());
 
     DeleteObject(SelectObject(renderDC,oldRenderBmp));
     DeleteObject(SelectObject(sketchDC,oldSketchBmp));
