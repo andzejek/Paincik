@@ -228,7 +228,6 @@ void CPaintBuffer::redo(){
         itredo++;
     }
 }
-#define errhandler(A,B) printf(A)
 void CPaintBuffer::saveToFile(wchar_t *_fileName){
         BYTE *bytes;
         HBITMAP temp=create32DIB(memDC,width,height,&bytes);///temp-because gdi-plus cant save h-bitmap what is current selected to DC?
