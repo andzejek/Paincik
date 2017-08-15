@@ -1,6 +1,7 @@
 #include "CPaintBuffer.h"
 ///#include "Vfw.h"
 CPaintBuffer::CPaintBuffer(HWND _hwnd,int _width,int _height){
+    //drawActions.push_back(vector<CDrawAction*>());
     isSketch=false;
     scaleX=1;
     scaleY=1;
@@ -10,25 +11,30 @@ CPaintBuffer::CPaintBuffer(HWND _hwnd,int _width,int _height){
 
     hdc=GetDC(hwnd);
 
-    memDC=CreateCompatibleDC(hdc);
-    oldMemBmp=(HBITMAP)SelectObject(memDC,create32DIB(memDC,_width,_height,&memBytes));
-    renderDC=CreateCompatibleDC(hdc);
-    oldRenderBmp=(HBITMAP)SelectObject(renderDC,create32DIB(renderDC,_width,_height,&renderBytes));
-    sketchDC=CreateCompatibleDC(hdc);
-    oldSketchBmp=(HBITMAP)SelectObject(sketchDC,create32DIB(sketchDC,_width,_height,&sketchBytes));
-    restoreDC=CreateCompatibleDC(hdc);
-    oldRestoreBmp=(HBITMAP)SelectObject(restoreDC,create32DIB(restoreDC,_width,_height,&restoreBytes));
+    memDC =     CreateCompatibleDC(hdc);
+    renderDC =  CreateCompatibleDC(hdc);
+    sketchDC =  CreateCompatibleDC(hdc);
+    restoreDC=  CreateCompatibleDC(hdc);
 
-    HPEN newRestorePen=CreatePen(PS_SOLID,1,RGB(0,255,255));
-    oldRestorePen=(HPEN)SelectObject(restoreDC,newRestorePen);
-    HBRUSH newRestoreBrush=CreateSolidBrush(RGB(255,255,0));
-    oldRestoreBrush=(HBRUSH) SelectObject(restoreDC,newRestoreBrush);
+    oldMemBmp       =(HBITMAP)SelectObject(memDC,       create32DIB(memDC,      _width,_height,&memBytes    ));
+    oldRenderBmp    =(HBITMAP)SelectObject(renderDC,    create32DIB(renderDC,   _width,_height,&renderBytes ));
+    oldSketchBmp    =(HBITMAP)SelectObject(sketchDC,    create32DIB(sketchDC,   _width,_height,&sketchBytes ));
+    oldRestoreBmp   =(HBITMAP)SelectObject(restoreDC,   create32DIB(restoreDC,  _width,_height,&restoreBytes));
 
 
     HPEN newMemPen=CreatePen(PS_SOLID,1,RGB(0,255,255));
-    oldMemPen=(HPEN)SelectObject(memDC,newMemPen);
     HBRUSH newMemBrush=CreateSolidBrush(RGB(255,255,0));
+    oldMemPen=(HPEN)SelectObject(memDC,newMemPen);
     oldMemBrush=(HBRUSH) SelectObject(memDC,newMemBrush);
+
+
+    HPEN newRestorePen=CreatePen(PS_SOLID,1,RGB(0,255,255));
+    HBRUSH newRestoreBrush=CreateSolidBrush(RGB(255,255,0));
+    oldRestorePen=(HPEN)SelectObject(restoreDC,newRestorePen);
+    oldRestoreBrush=(HBRUSH) SelectObject(restoreDC,newRestoreBrush);
+
+
+
 
 
     drawRect.left=0;
@@ -67,7 +73,7 @@ CPaintBuffer::~CPaintBuffer(){
 
     ReleaseDC(hwnd,hdc);
 }
-void CPaintBuffer::resize(int _width,int _height){
+void CPaintBuffer::resize(int _width,int _height,bool scale){
     width=_width;
     height=_height;
 
@@ -127,7 +133,9 @@ void CPaintBuffer::drawFullScreen(){
     StretchBlt(hdc, x, y, drawRect.right/scaleX, drawRect.bottom/scaleY, renderDC, drawRect.left, drawRect.top, drawRect.right, drawRect.bottom, SRCCOPY);
 }
 void CPaintBuffer::drawFigure(CDrawAction *figure){
-    if(figures.size()>5000)
+    printf("tu1\n");
+    figure->show();
+    /**if(figures.size()>5000)
     {
         for(int i=0;i<100;i++)
         {
@@ -139,10 +147,26 @@ void CPaintBuffer::drawFigure(CDrawAction *figure){
     }
     if(figures.size()%1000==0)printf("figures.size()=%d\n",figures.size());
     figure->drawToDC(memDC,memBytes);
-    figures.push_back(figure->clone());
+    figures.push_back(figure->clone());*/
+    figure->drawToDC(memDC,memBytes);
+    (drawActions.back()).push_back(figure->clone());
+    printf("tu2\n");
 }
 void CPaintBuffer::restore(){
-
+    printf("tu3\n");
+    clean();
+    BitBlt(memDC, 0, 0, width,height, restoreDC, 0, 0, SRCCOPY );
+    list<vector<CDrawAction*>>::iterator it;
+    it = drawActions.begin();
+    while(it != drawActions.end())
+    {
+        for(int i=0;i<(*it).size();i++)
+        {
+        (*it)[i]->drawToDC(memDC,memBytes);
+        }
+        ++it;
+    }
+/**
     clean();
     BitBlt(memDC, 0, 0, width,height, restoreDC, 0, 0, SRCCOPY );
     list<CDrawAction*>::iterator it;
@@ -151,21 +175,31 @@ void CPaintBuffer::restore(){
     {
         (*it)->drawToDC(memDC,memBytes);
         ++it;
-    }
+    }*/
+    printf("tu4\n");
 }
 void CPaintBuffer::undo(){
+    printf("tu5\n");
+        if(recording) return;
+        for(int i=0;i<1&&drawActions.size();i++){
+                for(int i=0;i<(drawActions.back()).size();i++)
+                {
+                    delete (drawActions.back())[i];
 
-        for(int i=0;i<20&&figures.size();i++){
+                }
+                drawActions.pop_back();}
+        /**for(int i=0;i<20&&figures.size();i++){
                 delete ((figures.back()));
                 figures.pop_back();}
         ///printf("figures.size()=%d\n",figures.size());
+        restore();*/
         restore();
+        printf("tu6\n");
     }
 #define errhandler(A,B) printf(A)
 void CPaintBuffer::saveToFile(wchar_t *_fileName){
-
         BYTE *bytes;
-        HBITMAP temp=create32DIB(memDC,width,height,&bytes);
+        HBITMAP temp=create32DIB(memDC,width,height,&bytes);///temp-because gdi-plus cant save h-bitmap what is current selected to DC?
         CopyMemory(bytes,memBytes,width*height*4);
         saveImage(_fileName,temp);
         DeleteObject(temp);
@@ -176,7 +210,7 @@ void CPaintBuffer::loadFromFile(wchar_t *_fileName){
     HBITMAP old=(HBITMAP) SelectObject(hdcTemp,image);
     BITMAP bmInfo;
     GetObject( image, sizeof( bmInfo ), & bmInfo );
-    resize(bmInfo.bmWidth,bmInfo.bmHeight);
+    resize(bmInfo.bmWidth,bmInfo.bmHeight,false);
     BitBlt(memDC, 0, 0, bmInfo.bmWidth, bmInfo.bmHeight, hdcTemp, 0, 0, SRCCOPY );
     BitBlt(restoreDC, 0, 0, bmInfo.bmWidth, bmInfo.bmHeight, hdcTemp, 0, 0, SRCCOPY );
     SelectObject(hdcTemp,old);

@@ -12,6 +12,7 @@ LRESULT CALLBACK ColorPaletteWindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 int WINAPI WinMain (HINSTANCE hThisInstance,HINSTANCE hPrevInstance,LPSTR lpszArgument,int nCmdShow){
     //InitCommonControls();
     //ERROR_TEST;
+
     int sysWidth=GetSystemMetrics(SM_CXSCREEN);
     int sysHeight=GetSystemMetrics(SM_CYSCREEN);
     MSG messages;

@@ -2,7 +2,7 @@
 #define CDrawAction_H
 
 #include "../stdafx.h"
-
+#include <typeinfo>
 
 
 
@@ -12,6 +12,7 @@ class CDrawAction{
         virtual void drawToDC(HDC hdc,BYTE *bytes);
         //virtual CDrawAction(CDrawAction *_figure);
         virtual ~CDrawAction(){};
+        virtual void show();
 
     protected:
     private:
@@ -21,6 +22,7 @@ class CFill:public CDrawAction{
     POINT start;
     COLORREF color;
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CFill(POINT _start,COLORREF _color){
             color=_color;
             start=_start;
@@ -42,6 +44,7 @@ class CLine:public CDrawAction{
     COLORREF color;
     int size;
     public:
+        void show(){printf("nazwa=%s\n",typeid( this ).name());}
         /*CLine(POINT _start,POINT _end){
             color=RGB(0,0,0);
             size=5;
@@ -74,6 +77,7 @@ class CEllipse : public CDrawAction{
     int size;
     COLORREF color,fillColor;
     public:
+        void show(){printf("nazwa=%s\n",typeid( this ).name());}
         CEllipse(POINT _start,POINT _end,int _size,COLORREF _color,COLORREF _fillColor,bool _transparent){
             color=_color;
             transparent=_transparent;
@@ -109,6 +113,7 @@ class CRectangle : public CDrawAction{
     int size;
     COLORREF color,fillColor;
     public:
+        void show(){printf("nazwa=%s\n",typeid( this ).name());}
         CRectangle(POINT _start,POINT _end,int _size,COLORREF _color,COLORREF _fillColor,bool _transparent){
             color=_color;
             transparent=_transparent;
@@ -143,6 +148,7 @@ class CPixel : public CDrawAction{
     POINT start;
     COLORREF color;
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CPixel(POINT _start,COLORREF _color)
     {
         color=_color;
@@ -160,6 +166,7 @@ public:
 };
 class CClean:public CDrawAction{
     CClean(){};
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     void drawToDC(HDC hdc,int width,int height)
     {
         RECT rect;rect.top=0;rect.left=0;rect.right=width;rect.bottom=height;
@@ -180,6 +187,7 @@ private:
     int size;
     COLORREF color;
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CRubber(POINT _start,int _size,COLORREF _color){
         start=_start;
         size=_size;//bo size 1 daje 0! ale fail przy redo sie pogrubiala linia xd ;P
@@ -206,6 +214,7 @@ class CSpray:public CDrawAction{
     int size;
     int seed;
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CSpray(POINT _start,int _size,COLORREF _color,int _seed)
     {
         start=_start;
@@ -242,6 +251,7 @@ class CSprayFast:public CDrawAction{///unusable not draw to restoreDC???
     int width;
     int height;
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CSprayFast(POINT _start,int _size,double _cover,COLORREF _color,int _seed,int _width,int _height)
     {
         start=_start;
@@ -255,7 +265,6 @@ public:
     }
     void drawToDC(HDC hdc,BYTE *bytes)
     {
-        COLORREF prevColor;
         srand(seed);
         int max=log(size)*(size);
         for(int i=1;i<(max);i++)
@@ -300,6 +309,7 @@ class CText:public CDrawAction{
     POINT start;
     wchar_t text[256];
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CText(POINT _start,wchar_t *_text)
     {
         wsprintfW(text,L"%s",_text);
@@ -323,6 +333,7 @@ class CText2:public CDrawAction{
     COLORREF color,color2;
     bool transparent;
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CText2(RECT _rect,wchar_t *_text,LPLOGFONT lpfont,COLORREF _color,COLORREF _color2,bool _transparent)
     {
         transparent=_transparent;
@@ -354,6 +365,7 @@ public:
 class CNegColor:public CDrawAction{
     POINT start,end;
 public:
+    void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CNegColor(POINT _start,POINT _end)
     {
         start=_start;
@@ -391,6 +403,7 @@ private:
         CopyMemory(data,_data,sizeof(BYTE)*width*height*4);
     }
     public:
+        void show(){printf("nazwa=%s\n",typeid( this ).name());}
     CPasteBMP(POINT _start,POINT _end,HDC src,int _width,int _height)
     {
 
@@ -457,6 +470,7 @@ class CPolygon :public CDrawAction{
     POINT *points;
     int pCount;
     public:
+        void show(){printf("nazwa=%s\n",typeid( this ).name());}
         CPolygon(POINT *_points,int _pCount,int _size,COLORREF _color,COLORREF _fillColor,bool _transparent){
             color=_color;
             transparent=_transparent;
@@ -466,6 +480,7 @@ class CPolygon :public CDrawAction{
             points=new POINT[pCount];
             CopyMemory(points,_points,pCount*sizeof(POINT));
         }
+
     void drawToDC(HDC hdc,BYTE *bytes){
         DeleteObject(SelectObject(hdc,CreatePen(PS_SOLID,size,color)));
         if(transparent)

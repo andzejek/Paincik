@@ -13,7 +13,6 @@
 #include <vector>
 #include <list>
 #define ERROR_TEST printf("error=%ld\n",GetLastError());
-
 uint64_t rdtsc();
 HBITMAP loadImage(wchar_t *_fileName);
 int saveImage(wchar_t* _fileName,HBITMAP _image);

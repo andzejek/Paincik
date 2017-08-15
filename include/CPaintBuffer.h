@@ -14,7 +14,7 @@ class CPaintBuffer{
 public:
     CPaintBuffer(HWND,int,int);
     void drawFigure(CDrawAction *figure);///
-    void resize(int,int);///
+    void resize(int,int,bool);///
     void clean();///
     void scaleUp(){
         scaled=true;
@@ -45,7 +45,6 @@ public:
     int getHeight() {return height;}
     void drawPaintBuffToRenderBuff()
     {
-
         if(isSketch)
         {
             BLENDFUNCTION bf;
@@ -138,7 +137,18 @@ private:
     double scaleX,scaleY;///do wyrzucenia
     bool scaled;///do wyrzucenia
     list<CDrawAction*> figures;
-
+    list<vector<CDrawAction*>> drawActions;
+    void startRecordActions(){
+        drawActions.push_back(vector<CDrawAction*>());
+        printf("zaczynam nagrywac!\n");
+        recording=true;
+    }
+    void endRecordActions(){
+        printf("nagralem=%d !\n",(drawActions.back()).size());
+        if( (drawActions.back()).size()==0 ) drawActions.pop_back();
+        recording=false;
+        printf("koncze nagrywac !\n");
+    }
     HBITMAP oldMemBmp;
     HBITMAP oldRestoreBmp;
     HPEN oldMemPen,oldRestorePen;
@@ -148,7 +158,7 @@ private:
     HBITMAP oldSketchBmp;
 
     int x=0,y=0;///do wyrzucenia
-
+    bool recording;
     HDC hdc;///do wyrzucenia
     HWND hwnd;
 };

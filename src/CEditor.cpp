@@ -31,7 +31,7 @@ int CEditor::onCreate(CREATESTRUCT *cs){
             SendMessage(paintToolsWnd,WM_COMMAND,CMD_SET_COLOR_2,color2);
             SendMessage(paintToolsWnd,WM_COMMAND,CMD_SET_PEN_SIZE,penSize);
             SendMessage(paintToolsWnd,WM_COMMAND,CMD_SET_COVER,cover);
-
+            lButtonHold=false;
             if(GetDeviceCaps(hdc,BITSPIXEL)!=32) onDestroy();///???
             return 0;
 }
@@ -47,7 +47,8 @@ int CEditor::onPaint(){
             return 0;
 }
 int CEditor::onLeftButtonDown(short x,short y,int keys){
-    POINT paintBuffSize=paintBuff->getSize();
+                paintBuff->startRecordActions();
+                POINT paintBuffSize=paintBuff->getSize();
                 RECT drawRect=paintBuff->getDrawRect();
                 x=(x-drawRect.left)*paintBuffSize.x/drawRect.right;
                 y=(y-drawRect.top)*paintBuffSize.y/drawRect.bottom;
@@ -188,7 +189,9 @@ int CEditor::onRightButtonDown(short x,short y,int keys){
                         if(figureMode==FMODE_FILL) color1=(this)->color2;
                         if(figureMode==FMODE_FRAME) transparent=true;
                         CPolygon polygon(&*polyPoints.begin(),polyPoints.size(),penSize,color1,color2,transparent);
+                        paintBuff->startRecordActions();
                         paintBuff->drawFigure(&polygon);
+                        paintBuff->endRecordActions();
                         polyPoints.clear();
                     }
     SendMessage(hWindow,WM_PAINT,0,0);
@@ -356,10 +359,11 @@ int CEditor::onLeftButtonUp(short x,short y,int keys){
                 changeTopSelectRectBorder=false;
                 changeBottomSelectRectBorder=false;
                 changeSelectRectPos=false;
+                paintBuff->endRecordActions();
                 return 0;
 }
 int CEditor::onDestroy(){
-
+    menu.set(hWindow);
     paintBuff->~CPaintBuffer();
     ReleaseDC(hWindow,hdc);
     DestroyWindow(hWindow);
@@ -379,6 +383,7 @@ int CEditor::onKeyDown(int key,int flags){
             if(GetAsyncKeyState(VK_CONTROL))
             {
                 ///FILE
+
                 if(key=='N') SendMessage(hWindow,WM_COMMAND,MENU_NEW,0);
                 if(key=='O') SendMessage(hWindow,WM_COMMAND,MENU_OPEN,0);
                 if(key=='S') SendMessage(hWindow,WM_COMMAND,MENU_SAVE,0);
@@ -455,15 +460,20 @@ int CEditor::onCommand(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
                 paintMode=(PaintMode)lParam;
                 if(paintMode!=MODE_TEXT)
                 {
+                    if(prevMode==MODE_TEXT)
+                    {
                     GetWindowText(edit,textBuffor,256*sizeof(wchar_t));
                     RECT rect;
                     rect.left=selectStart.x;
                     rect.right=selectEnd.x;
                     rect.bottom=selectEnd.y;
                     rect.top=selectStart.y;
+                    paintBuff->startRecordActions();
                     paintBuff->drawTextToBuff(rect,textBuffor,&lf,color1,color2,transparent);
+                    paintBuff->endRecordActions();
                     SetWindowText(edit,L"");
                     selecting=false;
+                    }
                 }
                 else if(prevMode!=MODE_TEXT){
                         CHOOSEFONT cfnt;
@@ -502,24 +512,29 @@ int CEditor::onCommand(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
                 if(selecting)
                 {
                     CNegColor cng(selectStart,selectEnd);
+                    paintBuff->startRecordActions();
                     paintBuff->drawFigure(&cng);
+                    paintBuff->endRecordActions();
+
                 }
             }
             if(wParam==MENU_CUT){
                 if(selecting)
                 {
-                OpenClipboard(hWindow);
-                EmptyClipboard();
-                HBITMAP temp=CreateCompatibleBitmap(hdc,selectEnd.x-selectStart.x, selectEnd.y-selectStart.y);
-                HDC hdc2=CreateCompatibleDC(hdc);
-                HBITMAP old=(HBITMAP)SelectObject(hdc2,temp);
-                StretchBlt(hdc2,0,0,selectEnd.x-selectStart.x, selectEnd.y-selectStart.y,paintBuff->memDC,selectStart.x,selectStart.y,selectEnd.x-selectStart.x, selectEnd.y-selectStart.y,SRCCOPY);
-                HBITMAP temp2=(HBITMAP)SelectObject(hdc2,old);
-                SetClipboardData(CF_BITMAP,temp2);
-                CloseClipboard();
-                DeleteDC(hdc2);
-                CRectangle rectangle(selectStart,selectEnd,1,color2,color2,false);
-                paintBuff->drawFigure(&rectangle);
+                    OpenClipboard(hWindow);
+                    EmptyClipboard();
+                    HBITMAP temp=CreateCompatibleBitmap(hdc,selectEnd.x-selectStart.x, selectEnd.y-selectStart.y);
+                    HDC hdc2=CreateCompatibleDC(hdc);
+                    HBITMAP old=(HBITMAP)SelectObject(hdc2,temp);
+                    StretchBlt(hdc2,0,0,selectEnd.x-selectStart.x, selectEnd.y-selectStart.y,paintBuff->memDC,selectStart.x,selectStart.y,selectEnd.x-selectStart.x, selectEnd.y-selectStart.y,SRCCOPY);
+                    HBITMAP temp2=(HBITMAP)SelectObject(hdc2,old);
+                    SetClipboardData(CF_BITMAP,temp2);
+                    CloseClipboard();
+                    DeleteDC(hdc2);
+                    CRectangle rectangle(selectStart,selectEnd,1,color2,color2,false);
+                    paintBuff->startRecordActions();
+                    paintBuff->drawFigure(&rectangle);
+                    paintBuff->endRecordActions();
                 }
             }
             if(wParam==MENU_COPY){
@@ -557,7 +572,10 @@ int CEditor::onCommand(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
                         GetObject(temp,sizeof(ibmp),&ibmp);
                         //StretchBlt(hdc, selectStart.x, selectStart.y, selectEnd.x-selectStart.x, selectEnd.y-selectStart.y, hdc3, 0, 0, ibmp.bmWidth, ibmp.bmHeight, SRCCOPY);
                         CPasteBMP cpbmp(selectStart,selectEnd,hdc3,ibmp.bmWidth,ibmp.bmHeight);
+                        paintBuff->startRecordActions();
                         paintBuff->drawFigure(&cpbmp);
+                        paintBuff->endRecordActions();
+
                         SelectObject(hdc2,old);
                         SelectObject(hdc3,oldFromHdc3);
                         DeleteObject(temp);
@@ -863,7 +881,8 @@ void CEditor::drawPaintBuffer(CPaintBuffer *paintBuffer){
     int t=rdtsc();
     paintBuff->drawPaintBuffToRenderBuff();
     int t2=rdtsc()-t;
-    printf("1zajelo to=%d\n",t2);
+    //printf("1zajelo to=%d\n",t2);
+
     if(paintMode==MODE_TEXT)paintBuff->drawTextToRenderBuff(rect,textBuffor,&lf,color1,color2,transparent);
                     bool transparent=false;
                     int color1=(this)->color1;
@@ -874,7 +893,7 @@ void CEditor::drawPaintBuffer(CPaintBuffer *paintBuffer){
     t=rdtsc();
     paintBuff->drawRenderBuffToDC(hdc);
     t2=rdtsc()-t;
-    printf("2zajelo to=%d\n",t2);
+    //printf("2zajelo to=%d\n",t2);
     rect=paintBuff->getDrawRect();
     HRGN hrgn=CreateRectRgn(rect.left,rect.top,rect.left+rect.right,rect.top+rect.bottom);
     SelectClipRgn(hdc,hrgn);///ten region po to zeby nie wychodzic z rysowaniem poza paintbuffer

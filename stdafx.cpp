@@ -1,4 +1,9 @@
 #include "stdafx.h"
+uint64_t rdtsc(){
+    unsigned int lo,hi;
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((uint64_t)hi << 32) | lo;
+    }
 HBITMAP loadImage(wchar_t *_fileName){
     Gdiplus::GdiplusStartupInput gpStartupInput;
     ULONG_PTR gpToken;
@@ -18,11 +23,11 @@ int saveImage(wchar_t* _fileName,HBITMAP _image){
     ULONG_PTR gpToken;
     GdiplusStartup(&gpToken, &gpStartupInput, NULL);
     CLSID bmpClsid,jpgClsid,gifClsid,tifClsid,pngClsid;
-    CLSIDFromString(L"{557CF400-1A04-11D3-9A73-0000F81EF32E}", &bmpClsid);
-    CLSIDFromString(L"{557CF401-1A04-11D3-9A73-0000F81EF32E}", &jpgClsid);
-    CLSIDFromString(L"{557CF402-1A04-11D3-9A73-0000F81EF32E}", &gifClsid);
-    CLSIDFromString(L"{557CF405-1A04-11D3-9A73-0000F81EF32E}", &tifClsid);
-    CLSIDFromString(L"{557CF406-1A04-11D3-9A73-0000F81EF32E}", &pngClsid);
+    CLSIDFromString(LPOLESTR(L"{557CF400-1A04-11D3-9A73-0000F81EF32E}"), &bmpClsid);
+    CLSIDFromString(LPOLESTR(L"{557CF401-1A04-11D3-9A73-0000F81EF32E}"), &jpgClsid);
+    CLSIDFromString(LPOLESTR(L"{557CF402-1A04-11D3-9A73-0000F81EF32E}"), &gifClsid);
+    CLSIDFromString(LPOLESTR(L"{557CF405-1A04-11D3-9A73-0000F81EF32E}"), &tifClsid);
+    CLSIDFromString(LPOLESTR(L"{557CF406-1A04-11D3-9A73-0000F81EF32E}"), &pngClsid);
     //int size=wcslen(_fileName);
     wchar_t *start=wcschr(_fileName,'.');
     //MessageBox(0,_fileName,start,0);
