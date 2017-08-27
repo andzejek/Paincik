@@ -1,6 +1,7 @@
 #ifndef CPAINTBUFFER_H
 #define CPAINTBUFFER_H
 #include "../stdafx.h"
+#include <memory>
 
 using namespace std;
 #include "CDrawAction.h"
