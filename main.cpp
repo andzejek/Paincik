@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <commctrl.h>
 #include "CEditor.h"
 wchar_t EditorClassName[ ] = L"EDITOR WINDOW CLASS";
 wchar_t PaintToolsClassName[ ] = L"EDITOR TOOLS CLASS";
@@ -12,6 +11,7 @@ LRESULT CALLBACK ColorPaletteWindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 int WINAPI WinMain (HINSTANCE hThisInstance,HINSTANCE hPrevInstance,LPSTR lpszArgument,int nCmdShow){
     //InitCommonControls();
     //ERROR_TEST;
+
     int sysWidth=GetSystemMetrics(SM_CXSCREEN);
     int sysHeight=GetSystemMetrics(SM_CYSCREEN);
     MSG messages;

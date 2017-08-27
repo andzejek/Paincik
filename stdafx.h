@@ -6,6 +6,7 @@
 #define _WIN32_WINNT 0x0500
 
 #include <windows.h>
+#include <commctrl.h>
 #include <gdiplus.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -13,7 +14,6 @@
 #include <vector>
 #include <list>
 #define ERROR_TEST printf("error=%ld\n",GetLastError());
-
 uint64_t rdtsc();
 HBITMAP loadImage(wchar_t *_fileName);
 int saveImage(wchar_t* _fileName,HBITMAP _image);

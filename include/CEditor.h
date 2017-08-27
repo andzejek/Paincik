@@ -17,11 +17,8 @@ extern wchar_t ColorPaletteClassName[];
 extern wchar_t ShapesToolClassName[];
 BOOL OpenSaveImageDialog(HWND, LPWSTR, WORD, BOOL);
 class CEditor : public CWindowEvents{
-    uint64_t rdtsc(){
-    unsigned int lo,hi;
-    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((uint64_t)hi << 32) | lo;
-    }
+
+    int onTimer(WPARAM,LPARAM) override;
     int onSysColorChange() override;
     int onVScroll(WPARAM wParam) override;
     int onHScroll(WPARAM wParam) override;
@@ -38,6 +35,7 @@ class CEditor : public CWindowEvents{
     int onMouseWheel(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
     void switchFullScreen();
+
     HWND paintToolsWnd,colorPaletteWnd;
     HWND shapesToolWnd;
     HWND edit;
@@ -107,7 +105,7 @@ private:
     POINT prev,prevReal;///poprzednie polozenie kursora.
     bool lButtonHold;
     COLORREF color1,color2;
-    wchar_t textBuffor[2048];///bufor textu do narysowania w paintbuforze a to nie wiem czy a byc w paint settings
+    wchar_t textBuffor[2048];///bufor textu do narysowania w paintbuforze a to nie wiem czy ma byc w paint settings
 };
 
 #endif // CEDITOR_H
